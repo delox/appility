@@ -2,22 +2,58 @@
 //  AppDelegate.swift
 //  Appi
 //
-//  Created by Jose Solorzano on 10/4/16.
+//  Created by Jose Solorzano on 10/5/16.
 //  Copyright © 2016 Jose Solorzano. All rights reserved.
 //
 
 import UIKit
 import CoreData
+import JLToast
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+    func getDocumentsDirectory() -> NSURL {
+        
+        let paths = NSFileManager.defaultManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
+        let documentsDirectory = paths[0]
+        return documentsDirectory
+    }
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+        
+        JLToastView.setDefaultValue(
+            UIColor.redColor(),
+            forAttributeName: JLToastViewBackgroundColorAttributeName,
+            userInterfaceIdiom: .Phone
+        )
+        
+        JLToastView.setDefaultValue(
+            UIColor.redColor(),
+            forAttributeName: JLToastViewBackgroundColorAttributeName,
+            userInterfaceIdiom: .Pad
+        )
+        
+        //Globally configuring colors
+        UINavigationBar.appearance().barTintColor = UIColor(red: 49, green: 163, blue: 114)
+        UINavigationBar.appearance().translucent = false
+        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName : UIColor.whiteColor(), NSFontAttributeName : UIFont(name: "Futura-Medium", size: 14)!]
+        UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+
+        if UIDevice.currentDevice().userInterfaceIdiom == .Pad
+        {
+            self.window?.rootViewController = UIStoryboard(name: "Main", bundle: NSBundle.mainBundle()).instantiateViewControllerWithIdentifier("iPadNavController")
+        }
+        
+        
+        
         return true
+    }
+    
+     func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return UIStatusBarStyle.LightContent
     }
 
     func applicationWillResignActive(application: UIApplication) {
@@ -88,6 +124,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let coordinator = self.persistentStoreCoordinator
         var managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
         managedObjectContext.persistentStoreCoordinator = coordinator
+        managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+        
         return managedObjectContext
     }()
 
